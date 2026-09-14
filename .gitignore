@@ -1,0 +1,15 @@
+# Entorno virtual
+.venv/
+venv/
+
+# Bytecode de Python
+__pycache__/
+*.pyc
+
+# Modelo de MediaPipe: pesa ~9 MB y el programa lo descarga solo
+*.task
+
+# Sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
