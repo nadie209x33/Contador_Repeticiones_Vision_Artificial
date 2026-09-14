@@ -4,6 +4,16 @@ Cuenta repeticiones de ejercicio en tiempo real desde la webcam, usando detecci�
 de pose de MediaPipe. Incluye curl de bíceps, sentadilla, press de hombros y
 elevación lateral, seleccionables desde un menú en pantalla.
 
+## Dos versiones
+
+| | Dónde corre | Para qué |
+|---|---|---|
+| `contador_repeticiones.py` | Escritorio, con Python | La versión completa |
+| `web/` | Navegador, sin instalar nada | Probarlo desde el celular o compartir un enlace |
+
+Las dos usan la misma lógica. La web se documenta en [docs/WEB.md](docs/WEB.md),
+incluido cómo publicarla en Cloudflare Pages.
+
 ## Requisitos
 
 - Python 3.13
@@ -80,6 +90,8 @@ medición no se acepta y aparece un aviso indicando cuál falla.
 | `requirements.txt` | Dependencias con versiones fijadas |
 | `docs/DISENO.md` | Cómo funciona por dentro y por qué |
 | `docs/CODIGO.md` | El código explicado línea por línea |
+| `docs/WEB.md` | La versión para navegador y cómo publicarla |
+| `web/` | La versión para navegador |
 | `pose_landmarker_full.task` | Modelo de MediaPipe, se descarga solo |
 | `.venv/`, `__pycache__/` | Generados, no se versionan |
 
