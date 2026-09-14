@@ -44,8 +44,8 @@ dirección**.
 
 > En un frame de 640×480, moverse 10 píxeles a la derecha suma 0.0156 a `x`, pero
 > 10 píxeles hacia abajo suma 0.0208 a `y`. Es como medir el ancho en metros y el
-> alto en yardas: podés dibujar bien, pero cualquier ángulo que calcules va a
-> estar torcido.
+> alto en yardas: el dibujo resulta correcto, pero cualquier ángulo calculado
+> queda distorsionado.
 
 Medido sobre 640×480, el error llega a **16°**: un codo que en realidad está a
 100° se lee como 83.6°. Con un umbral en 55°, esa deriva alcanza para que una
@@ -125,9 +125,9 @@ umbral flexionado = percentil 5  + MARGEN_UMBRAL · recorrido
 umbral extendido  = percentil 95 − MARGEN_UMBRAL · recorrido
 ```
 
-> **Qué es un percentil.** Si ordenás 100 mediciones de menor a mayor, el
-> percentil 5 es la que quedó en la posición 5 y el percentil 95 la que quedó en
-> la 95. O sea: casi el mínimo y casi el máximo, pero descartando los extremos.
+> **Qué es un percentil.** Al ordenar 100 mediciones de menor a mayor, el
+> percentil 5 es la que ocupa la posición 5 y el percentil 95 la que ocupa la
+> 95. Equivalen a casi el mínimo y casi el máximo, descartando los extremos.
 >
 > Con un recorrido de 82° a 165° y `MARGEN_UMBRAL = 0.15`, los umbrales quedan en
 > 95° y 152°.
@@ -200,8 +200,8 @@ El filtro **1-euro** cambia cuánto suaviza según la velocidad del punto:
 corte = FILTRO_CORTE + FILTRO_BETA · velocidad
 ```
 
-> Es como un amigo que te corrige la puntería: si estás quieto te sostiene la
-> mano con firmeza, pero si movés el brazo rápido te suelta para no frenarte.
+> Opera como un apoyo que sostiene con firmeza mientras el punto permanece
+> quieto, y lo libera cuando se desplaza rápido para no frenar el movimiento.
 
 Se aplica a cada coordenada, no al ángulo final, y también a los píxeles para que
 los marcadores no bailen.
@@ -278,7 +278,7 @@ Dos advertencias:
 La tecla `d` imprime por consola el brazo activo, el ángulo, el rango observado,
 los umbrales vigentes y la confianza de cada punto.
 
-| Lo que ves | Qué significa | Qué hacer |
+| Mensaje | Qué significa | Cómo resolverlo |
 |------------|---------------|-----------|
 | *No veo bien...* | Uno de los dos puntos externos no llega a `UMBRAL_VISIBILIDAD` | Luz de frente, entrar entero en cuadro |
 | *No puedo ubicar... con seguridad* | El vértice no pasó la validación geométrica | Mostrar el miembro entero; si sigue, subir `TOLERANCIA_LONGITUD` |
@@ -345,7 +345,7 @@ grupos de un solo elemento.
 ### Qué falta para otros ejercicios
 
 Las flexiones de brazos miden bien el ángulo del codo, pero desde una webcam de
-escritorio quedás en el piso y los puntos se autoocluyen. Los jumping jacks y los
+escritorio el cuerpo queda en el piso y los puntos se autoocluyen. Los jumping jacks y los
 burpees no son un solo ángulo: necesitan combinar dos señales, o sea otra máquina
 de estados.
 
@@ -356,9 +356,9 @@ de estados.
 Se abre con `e` y se dibuja sobre la misma imagen de OpenCV: una tarjeta centrada
 con el fondo atenuado, la lista numerada y el ejercicio actual en verde.
 
-Mientras está abierto **el conteo se pausa**, para no sumar repeticiones mientras
-elegís. La detección sigue corriendo, así que al cerrarlo no hay que esperar a
-que el modelo vuelva a encontrarte.
+Mientras permanece abierto **el conteo se pausa**, para no sumar repeticiones durante
+la selección. La detección continúa en ejecución, de modo que al cerrarlo no es
+necesario esperar a que el modelo vuelva a localizar a la persona.
 
 Al cambiar de ejercicio se reinician el contador, la calibración, los filtros y
 la referencia de longitudes: todo eso era del ejercicio anterior.

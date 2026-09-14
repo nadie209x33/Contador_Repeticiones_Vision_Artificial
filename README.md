@@ -1,18 +1,19 @@
 # Contador de repeticiones con visión artificial
 
-Cuenta repeticiones de ejercicio en tiempo real desde la webcam, usando detección
-de pose de MediaPipe. Incluye curl de bíceps, sentadilla, press de hombros y
-elevación lateral, seleccionables desde un menú en pantalla.
+Cuenta repeticiones de ejercicio en tiempo real desde la webcam, mediante
+detección de pose de MediaPipe. Incluye curl de bíceps, sentadilla, press de
+hombros y elevación lateral, seleccionables desde un menú en pantalla.
 
 ## Dos versiones
 
-| | Dónde corre | Para qué |
+| | Dónde se ejecuta | Propósito |
 |---|---|---|
 | `contador_repeticiones.py` | Escritorio, con Python | La versión completa |
-| `web/` | Navegador, sin instalar nada | Probarlo desde el celular o compartir un enlace |
+| `web/` | Navegador, sin instalación | Uso desde dispositivos móviles o distribución mediante un enlace |
 
-Las dos usan la misma lógica. La web se documenta en [docs/WEB.md](docs/WEB.md),
-incluido cómo publicarla en Cloudflare Pages.
+Ambas comparten la misma lógica. La versión web se documenta en
+[docs/WEB.md](docs/WEB.md), incluido el procedimiento de publicación en
+Cloudflare Pages.
 
 ## Requisitos
 
@@ -39,48 +40,51 @@ python -m venv .venv
 | Tecla | Acción |
 |-------|--------|
 | `e` | Abrir o cerrar el menú de ejercicios |
-| `1`–`4` | Elegir ejercicio (con el menú abierto) |
+| `1`–`4` | Seleccionar ejercicio (con el menú abierto) |
 | `r` | Reiniciar el contador |
 | `d` | Volcar un diagnóstico por consola |
 | `q` | Salir |
 
-Mientras el menú está abierto el conteo se pausa, así que no se suman
-repeticiones por accidente al elegir.
+Mientras el menú permanece abierto el conteo se pausa, de modo que no se
+registran repeticiones durante la selección.
 
 ## Ejercicios
 
-| Ejercicio | Articulación | Cómo pararte |
-|-----------|--------------|--------------|
+| Ejercicio | Articulación | Posición frente a la cámara |
+|-----------|--------------|------------------------------|
 | Curl de bíceps | Codo | **De perfil** |
 | Sentadilla | Rodilla | **De perfil**, cuerpo entero |
 | Press de hombros | Codo | **De frente** |
 | Elevación lateral | Hombro | **De frente** |
 
-**La orientación no es la misma para todos, y es la causa más común de que no
-cuente.** El movimiento tiene que verse *a lo ancho* de la imagen, no hacia la
-cámara: MediaPipe estima mal la profundidad, así que un movimiento que va y viene
-hacia el lente se mide comprimido y el programa no lo reconoce.
+**La orientación no es la misma para todos los ejercicios, y constituye la causa
+más frecuente de fallos en el conteo.** El movimiento debe percibirse a lo ancho
+de la imagen, no en dirección a la cámara: MediaPipe estima la profundidad con
+escasa precisión, de manera que un desplazamiento hacia el lente se mide
+comprimido y el programa no lo reconoce.
 
-El curl y la sentadilla ocurren en el plano lateral del cuerpo, por eso van de
-perfil. El press y la elevación ocurren en el plano frontal, por eso van de
-frente. El programa te recuerda cuál corresponde en pantalla y en el menú.
+El curl y la sentadilla ocurren en el plano lateral del cuerpo, por lo que
+requieren una vista de perfil. El press y la elevación ocurren en el plano
+frontal, por lo que requieren una vista frontal. El programa indica la
+orientación correspondiente en pantalla y en el menú.
 
-La sentadilla además necesita que entres completo en cuadro: hay que alejarse
-unos 2–3 metros.
+La sentadilla exige además que el cuerpo entre completo en el cuadro, lo que
+implica una distancia de entre dos y tres metros respecto de la cámara.
 
-Al cambiar de ejercicio se reinicia el contador y la calibración.
+Al cambiar de ejercicio se reinician el contador y la calibración.
 
-## Para que la medición funcione
+## Condiciones para una medición correcta
 
-- **La luz tiene que venir de adelante.** Con una ventana detrás, la cámara
+- **La iluminación debe provenir del frente.** Con una ventana detrás, la cámara
   expone para la ventana y el cuerpo queda en silueta.
-- Ponete en la orientación que indica el ejercicio, con las tres articulaciones
+- Adoptar la orientación que indica el ejercicio, con las tres articulaciones
   dentro del cuadro.
-- **Hacé la primera repetición completa y lenta**: sirve para calibrar. Hasta que
-  el programa mida tu recorrido no cuenta nada, y te lo avisa en pantalla.
+- **Realizar la primera repetición de forma completa y lenta**: sirve para
+  calibrar. Hasta que el programa determine el recorrido no contabiliza nada, y
+  lo advierte en pantalla.
 
-Los tres puntos que se miden se dibujan en verde. Si alguno se pone rojo, la
-medición no se acepta y aparece un aviso indicando cuál falla.
+Los tres puntos que se miden se dibujan en verde. Si alguno se muestra en rojo,
+la medición no se acepta y aparece un aviso que indica cuál de ellos falla.
 
 ## Archivos
 
@@ -88,27 +92,28 @@ medición no se acepta y aparece un aviso indicando cuál falla.
 |---------|--|
 | `contador_repeticiones.py` | El programa |
 | `requirements.txt` | Dependencias con versiones fijadas |
-| `docs/DISENO.md` | Cómo funciona por dentro y por qué |
+| `docs/DISENO.md` | Funcionamiento interno y fundamentos de las decisiones |
 | `docs/CODIGO.md` | El código explicado línea por línea |
-| `docs/WEB.md` | La versión para navegador y cómo publicarla |
+| `docs/WEB.md` | La versión para navegador y su publicación |
 | `web/` | La versión para navegador |
-| `pose_landmarker_full.task` | Modelo de MediaPipe, se descarga solo |
+| `pose_landmarker_full.task` | Modelo de MediaPipe, se descarga automáticamente |
 | `.venv/`, `__pycache__/` | Generados, no se versionan |
 
 ## Ajustes
 
-Los parámetros están al inicio de `contador_repeticiones.py`. Los que se suelen
-tocar:
+Los parámetros se encuentran al inicio de `contador_repeticiones.py`. Los de uso
+más frecuente:
 
 | Parámetro | Valor | Qué controla |
 |-----------|-------|--------------|
-| `EJERCICIO` | `"curl"` | Ejercicio con el que arranca el programa |
+| `EJERCICIO` | `"curl"` | Ejercicio con el que se inicia el programa |
 | `LADO` | `"auto"` | Lado a medir: `"derecho"`, `"izquierdo"` o `"auto"` |
 | `MODELO` | `"full"` | `lite` (rápido) / `full` / `heavy` (preciso) |
-| `MEJORAR_CONTRASTE` | `True` | Realce de contraste contra el contraluz |
+| `MEJORAR_CONTRASTE` | `True` | Realce de contraste frente al contraluz |
 
-Cada ejercicio tiene sus propios ajustes en el diccionario `EJERCICIOS`. Para
-agregar uno nuevo alcanza con sumar una entrada ahí: no hay que tocar la lógica.
+Cada ejercicio dispone de sus propios ajustes en el diccionario `EJERCICIOS`.
+Para incorporar uno nuevo basta con añadir una entrada: no requiere modificar la
+lógica.
 
-El resto está documentado en [docs/DISENO.md](docs/DISENO.md), y el código explicado en
-[docs/CODIGO.md](docs/CODIGO.md).
+El resto se documenta en [docs/DISENO.md](docs/DISENO.md), y el código se
+explica en [docs/CODIGO.md](docs/CODIGO.md).

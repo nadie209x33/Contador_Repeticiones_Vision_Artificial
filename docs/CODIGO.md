@@ -1,10 +1,10 @@
 # El código explicado
 
 Recorrido completo de `contador_repeticiones.py`, con cada línea comentada. El
-archivo `.py` va limpio: todas las explicaciones están acá.
+archivo `.py` no lleva comentarios: todas las explicaciones se encuentran aquí.
 
 Para el *por qué* de las decisiones, ver [DISENO.md](DISENO.md). Al final hay una
-sección sobre [cómo leer código que no conocés](#cómo-entender-un-código).
+sección sobre [cómo leer código desconocido](#cómo-entender-un-código).
 
 ---
 
@@ -41,8 +41,9 @@ from mediapipe.tasks.python import vision as mp_vision   # el detector de pose
 **Qué es un `deque`.** Una lista que se autolimita: al llenarse, cada elemento
 nuevo expulsa al más viejo.
 
-> Con `deque(maxlen=3)`, si agregás 1, 2, 3 y después 4, te queda `[2, 3, 4]`. El
-> 1 se fue solo. Sirve para guardar "los últimos N" sin que la memoria crezca.
+> Con `deque(maxlen=3)`, al agregar 1, 2, 3 y luego 4, el contenido queda en
+> `[2, 3, 4]`: el 1 se descarta solo. Sirve para conservar "los últimos N"
+> sin que la memoria crezca.
 
 ---
 
@@ -76,8 +77,8 @@ RESOLUCION = (1280, 720)       # resolución pedida a la cámara
 VENTANA = "Contador de repeticiones"    # título de la ventana
 ```
 
-Notá que acá **no** están los umbrales de ángulo ni la amplitud mínima: esos
-dependen del ejercicio y viven en el diccionario `EJERCICIOS`.
+Cabe señalar que aquí **no** figuran los umbrales de ángulo ni la amplitud
+mínima: dependen del ejercicio y residen en el diccionario `EJERCICIOS`.
 
 ---
 
@@ -157,8 +158,8 @@ EJERCICIOS = {
 }
 ```
 
-Toda la diferencia entre ejercicios está acá. Para agregar uno nuevo alcanza con
-sumar una entrada: no se toca ni una línea de lógica.
+Toda la diferencia entre ejercicios reside aquí. Incorporar uno nuevo requiere
+únicamente añadir una entrada: no se modifica ninguna línea de lógica.
 
 La elevación lateral es la más ilustrativa: su vértice es el **hombro**, no el
 codo. Eso demuestra que `calcular_angulo` es genérica de verdad.
@@ -322,7 +323,7 @@ tardó. Esa velocidad también se suaviza, para que no salte.
         return self._x
 ```
 
-Acá está la idea del filtro: **el corte depende de la velocidad**.
+Aquí reside la idea del filtro: **el corte depende de la velocidad**.
 
 > Con el punto quieto la velocidad es ~0, el corte queda en 1.0 y `alfa` sale
 > chico: suaviza fuerte. Con el punto a 0.8 m/s el corte sube a 9, `alfa` se
@@ -404,7 +405,7 @@ La última línea, leída de adentro hacia afuera:
 la computadora pueden dar 1.0000000002. `arccos` de ese número no existe y el
 programa se caería. `clip` lo recorta a 1 y listo.
 
-> Probalo: `calcular_angulo([0, 0], [0, 1], [1, 1])` da 90°.
+> Por ejemplo, `calcular_angulo([0, 0], [0, 1], [1, 1])` devuelve 90°.
 
 ### confianza y confianza_grupo
 
@@ -551,9 +552,9 @@ amplitud mínima. Al cambiar de ejercicio se crea una máquina nueva.
 `@property` permite escribir `maquina.recorrido` en vez de `maquina.recorrido()`:
 se usa como si fuera un dato, aunque por dentro calcule.
 
-> **Percentil 5 y 95.** Si ordenás 100 mediciones de menor a mayor, son la que
-> quedó en la posición 5 y la que quedó en la 95. Los extremos crudos recogen el
-> ruido; los percentiles lo descartan.
+> **Percentil 5 y 95.** Al ordenar 100 mediciones de menor a mayor, corresponden
+> a la que ocupa la posición 5 y a la que ocupa la 95. Los extremos crudos
+> recogen el ruido; los percentiles lo descartan.
 
 ```python
         if recorrido < self.ejercicio["amplitud_min"]:   # movimiento muy chico
@@ -592,10 +593,11 @@ saltos mide qué tan brusca es la señal.
 > Con un recorrido de 82° a 165°, el margen es `0.15 × 83 = 12.5`. Los umbrales
 > quedan en 94.5° y 152.5°: hay que completar el 85% del movimiento.
 
-Devolver `None` es importante: significa "no sé cuál es tu recorrido, así que no
-cuento". No hay umbrales de respaldo, porque un par de ángulos fijos o queda
-fuera del alcance del movimiento —y entonces no cuenta nunca— o es tan ancho que
-el ruido lo cruza solo.
+Devolver `None` es importante: equivale a declarar que el recorrido todavía no
+se conoce y que, por lo tanto, no corresponde contar. No existen umbrales de
+respaldo, porque un par de ángulos fijos o queda fuera del alcance del
+movimiento —y entonces no cuenta nunca— o resulta tan amplio que el ruido lo
+cruza por sí solo.
 
 ```python
     def actualizar(self, angulo, ahora):
@@ -628,7 +630,7 @@ ruido alrededor de un único umbral dispararía varios conteos seguidos.
         self.estado = nuevo                  # el nuevo pasa a ser el actual
 ```
 
-Acá está lo que hace que un mismo motor sirva para los cuatro ejercicios. Se
+Aquí reside lo que permite que un mismo motor sirva para los cuatro ejercicios. Se
 compara **la transición** `(anterior, nuevo)`, y `contar_en` decide cuál cuenta:
 
 - En el curl y la sentadilla, la repetición termina al doblar → `("down", "up")`.
@@ -743,7 +745,7 @@ el resultado se escriba sobre `image` misma.
     y0 = (alto - alto_caja) // 2             # y verticalmente
 ```
 
-La caja se dimensiona sola: si agregás un quinto ejercicio, se hace más alta.
+La caja se dimensiona sola: al incorporar un quinto ejercicio, aumenta su altura.
 
 ```python
     caja = image[y0 : y0 + alto_caja, x0 : x0 + ancho_caja]     # recorte de la zona
@@ -814,7 +816,7 @@ El mensaje se arma con los nombres del ejercicio activo, así que en la sentadil
 dice "No veo bien el pie" y en el curl "No veo bien la mano".
 
 El cuarto caso es el que evita que el programa falle en silencio: si mide bien
-pero todavía no conoce tu recorrido, lo dice en vez de simplemente no contar.
+pero todavía no conoce el recorrido, lo informa en lugar de limitarse a no contar.
 
 `" ni ".join(["el hombro", "la mano"])` arma `"el hombro ni la mano"`.
 
@@ -1018,7 +1020,7 @@ calcular, o sea si pasó la validación geométrica.
 ```
 
 El `and not menu` es lo que **pausa el conteo mientras el menú está abierto**. La
-detección sigue corriendo, pero no se suman repeticiones mientras elegís.
+detección continúa en ejecución, pero no se suman repeticiones durante la selección.
 
 ```python
         if angulo is not None and vertice_px is not None:
@@ -1127,71 +1129,78 @@ en cambio alguien lo importa desde otro archivo, no arranca solo.
 
 ## Cómo entender un código
 
-Técnicas que sirven para cualquier código, no solo para este.
+Técnicas aplicables a cualquier código, no solo a este.
 
-### 1. Empezá por el final, no por el principio
+### 1. Comenzar por el final, no por el principio
 
-Buscá `main()` o el punto de entrada y leelo primero. Te da el mapa: qué pasa y
-en qué orden. Después bajás a las funciones que te interesen.
+Conviene localizar `main()` o el punto de entrada y leerlo en primer lugar,
+porque ofrece el mapa general: qué ocurre y en qué orden. Recién después tiene
+sentido descender a las funciones concretas.
 
-Leer de arriba hacia abajo es la peor forma: arrancás con 40 constantes sueltas
-sin saber para qué son.
+La lectura de arriba hacia abajo resulta la menos eficaz: obliga a empezar por
+cuarenta constantes sueltas sin conocer su finalidad.
 
-### 2. Leé los nombres antes que el contenido
+### 2. Leer los nombres antes que el contenido
 
 ```bash
 grep -n "^def \|^class " contador_repeticiones.py
 ```
 
-Eso te da el índice del archivo en una pantalla. Si los nombres son buenos, ya
-entendés el 60% sin leer una sola línea de lógica.
+El resultado condensa el índice del archivo en una sola pantalla. Si los nombres
+están bien elegidos, permite comprender buena parte del programa sin leer una
+línea de lógica.
 
-### 3. Ejecutá pedazos sueltos
+### 3. Ejecutar fragmentos aislados
 
-No hace falta correr todo el programa para entender una función:
+No es necesario ejecutar el programa completo para entender una función:
 
 ```python
 import contador_repeticiones as m
 print(m.calcular_angulo([0, 0], [0, 1], [1, 1]))   # 90.0
 ```
 
-Probá con valores cuyo resultado ya conozcas y verificá que dé lo esperado. Esto
-vale más que veinte minutos mirando la pantalla.
+Conviene probar con valores cuyo resultado se conozca de antemano y comprobar
+que coincida con lo esperado. Este método aporta más que la lectura prolongada.
 
-### 4. Poné `print` en el medio
+### 4. Insertar `print` en puntos intermedios
 
-La forma más simple y más efectiva de saber qué pasa: imprimí una variable justo
-antes de la línea que no entendés. Si el número que aparece no es el que
-imaginabas, ahí está tu malentendido.
+Es la forma más simple y efectiva de observar el comportamiento real: imprimir
+una variable inmediatamente antes de la línea que no se comprende. Si el valor
+que aparece difiere del esperado, ahí se localiza el malentendido.
 
-### 5. Preguntá "¿qué pasa si saco esto?"
+### 5. Preguntarse qué ocurre al eliminar una línea
 
-Comentá una línea y corré. Si nada cambia, esa línea no hacía lo que creías. Si
-todo explota, acabás de descubrir para qué estaba.
+Comentar una línea y ejecutar de nuevo. Si nada cambia, esa línea no cumplía la
+función que se le atribuía. Si el programa falla, queda en evidencia su
+propósito.
 
-> Probá sacar el `np.clip` de `calcular_angulo` y pasarle tres puntos alineados.
+> Un ejemplo: eliminar el `np.clip` de `calcular_angulo` y pasarle tres puntos
+> alineados.
 
-### 6. Separá el "qué" del "por qué"
+### 6. Distinguir el "qué" del "por qué"
 
-El código dice **qué** hace; casi nunca dice **por qué**. Cuando algo parece
-innecesariamente complicado, suele haber una razón que no está a la vista: un
-error que apareció una vez, una limitación de la librería.
+El código expresa **qué** hace; rara vez explica **por qué**. Cuando una
+solución parece innecesariamente compleja, suele responder a una razón que no
+resulta visible: un error detectado en su momento, o una limitación de la
+librería.
 
-Por eso este proyecto separa los documentos: el `.py` es el qué,
-[DISENO.md](DISENO.md) es el por qué.
+Ese es el motivo por el que este proyecto separa los documentos: el `.py`
+contiene el qué, y [DISENO.md](DISENO.md) el por qué.
 
-### 7. Seguí un dato de punta a punta
+### 7. Seguir un dato de extremo a extremo
 
-Agarrá papel y seguí un solo dato: de dónde sale, quién lo modifica, dónde
+Resulta útil rastrear un único dato: dónde se origina, qué lo modifica y dónde
 termina.
 
-> Acá: un punto sale de MediaPipe → pasa por el suavizador → entra en el cálculo
-> del ángulo → alimenta la máquina de estados → suma al contador.
+> En este caso: un punto proviene de MediaPipe → pasa por el suavizador → entra
+> en el cálculo del ángulo → alimenta la máquina de estados → incrementa el
+> contador.
 
-Cinco pasos. Todo lo demás son detalles que cuelgan de esa línea.
+Cinco pasos. Todo lo demás son detalles que dependen de esa secuencia.
 
-### 8. No intentes entender todo de una
+### 8. No intentar comprender todo de una vez
 
-Está bien tratar una función como una caja negra si su nombre te alcanza. No
-necesitás saber cómo funciona CLAHE por dentro para entender que mejora el
-contraste. Volvé después, si hace falta.
+Es válido tratar una función como una caja negra cuando su nombre resulta
+suficiente. No hace falta conocer el funcionamiento interno de CLAHE para
+entender que mejora el contraste. El detalle puede abordarse más adelante, si
+llega a ser necesario.
