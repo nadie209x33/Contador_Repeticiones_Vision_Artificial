@@ -1,5 +1,8 @@
 # La versión web
 
+Para el uso del programa de escritorio, ver [README.md](../README.md); para sus
+decisiones de diseño, [DISENO.md](DISENO.md).
+
 El proyecto incluye, además del programa de escritorio, una versión que se
 ejecuta en el navegador, ubicada en la carpeta `web/`. Permite utilizar la
 aplicación desde un dispositivo móvil o distribuirla mediante un enlace, sin

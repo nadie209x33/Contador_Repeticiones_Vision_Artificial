@@ -1,7 +1,9 @@
 # Cómo funciona y por qué
 
-Las decisiones de diseño del programa, explicadas. Para el uso, ver
-[README.md](README.md); para el código línea por línea, [CODIGO.md](CODIGO.md).
+Las decisiones de diseño del programa, explicadas.
+
+Para el uso, ver [README.md](../README.md); para el código línea por línea,
+[CODIGO.md](CODIGO.md); para la versión de navegador, [WEB.md](WEB.md).
 
 ---
 
@@ -290,6 +292,8 @@ detectar si la versión de Python y la versión web se separan.
 | `TOLERANCIA_LONGITUD` | `0.4` | Desvío máximo de brazo y antebrazo |
 | `FILTRO_CORTE` | `1.0` | Suavizado en reposo |
 | `FILTRO_BETA` | `10.0` | Respuesta al movimiento rápido |
+| `RESOLUCION` | `(1280, 720)` | Resolución solicitada a la cámara |
+| `TAMANO_MINIMO_MODELO` | `1_000_000` | Bytes por debajo de los cuales la descarga se considera fallida |
 
 ---
 

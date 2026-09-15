@@ -3,8 +3,9 @@
 Recorrido completo de `contador_repeticiones.py`, con cada línea comentada. El
 archivo `.py` no lleva comentarios: todas las explicaciones se encuentran aquí.
 
-Para el *por qué* de las decisiones, ver [DISENO.md](DISENO.md). Al final hay una
-sección sobre [cómo leer código desconocido](#cómo-entender-un-código).
+Para el *por qué* de las decisiones, ver [DISENO.md](DISENO.md); para el uso,
+[README.md](../README.md). Al final hay una sección sobre
+[cómo leer código desconocido](#cómo-entender-un-código).
 
 ---
 
