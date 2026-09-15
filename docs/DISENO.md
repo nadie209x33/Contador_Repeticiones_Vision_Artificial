@@ -236,6 +236,26 @@ Dos advertencias:
 
 ---
 
+## Pruebas
+
+La lógica se ejecuta con `python -m unittest`. Son 45 casos que cubren el
+cálculo del ángulo, la validación geométrica, la calibración, el rechazo de
+ruido, la selección de lado y la descarga del modelo.
+
+Todas las funciones bajo prueba son puras: reciben números y devuelven números,
+sin cámara ni estado global. Esa característica no es accidental, sino la razón
+por la que la lógica se mantiene separada del dibujo y de la captura.
+
+Los casos documentan el comportamiento observado, no solo el esperado. Varios
+corresponden a fallos reales detectados durante el desarrollo: la comparación
+con `None` en los campos de confianza, el recorrido comprimido que los umbrales
+fijos no alcanzaban, y el ruido que producía repeticiones falsas cuando la
+amplitud se calculaba con mínimo y máximo.
+
+El archivo `tests/casos_compartidos.json` contiene entradas y resultados que
+**ambas implementaciones deben reproducir de forma idéntica**. Sirve para
+detectar si la versión de Python y la versión web se separan.
+
 ## Otros detalles
 
 - **Timestamps reales.** MediaPipe usa el tiempo entre frames para seguir a la

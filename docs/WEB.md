@@ -98,6 +98,21 @@ equivalencia se verificó ejecutando los mismos escenarios en ambos lenguajes:
 
 Los once escenarios coinciden de forma exacta.
 
+Esa verificación quedó registrada en `tests/casos_compartidos.json`, que
+contiene entradas y resultados esperados. La suite de Python los comprueba en
+cada ejecución; para comprobarlos desde el navegador, con la página abierta:
+
+```js
+const L = await import('/logica.js');
+const casos = await (await fetch('/../tests/casos_compartidos.json')).json();
+const ruido = (i) => { const x = Math.sin(i * 12.9898) * 43758.5453;
+                       return (x - Math.floor(x) - 0.5) * 2; };
+casos.angulos.forEach((c) =>
+  console.assert(Math.abs(L.calcularAngulo(...c.puntos) - c.esperado) < 1e-6, c.nombre));
+```
+
+Si alguno falla, las dos implementaciones se separaron.
+
 ### Componentes sustituidos
 
 | Escritorio | Web |

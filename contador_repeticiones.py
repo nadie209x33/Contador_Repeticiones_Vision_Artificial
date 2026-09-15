@@ -26,6 +26,7 @@ TOLERANCIA_LONGITUD = 0.4
 FILTRO_CORTE = 1.0
 FILTRO_BETA = 10.0
 
+TAMANO_MINIMO_MODELO = 1_000_000
 RESOLUCION = (1280, 720)
 VENTANA = "Contador de repeticiones"
 
@@ -131,10 +132,26 @@ MODEL_URL = (
 )
 
 
+def descargar_modelo(destino=MODEL_PATH, url=MODEL_URL):
+    parcial = destino + ".parcial"
+    print("Descargando modelo de pose (solo la primera vez)...")
+    try:
+        urllib.request.urlretrieve(url, parcial)
+        if os.path.getsize(parcial) < TAMANO_MINIMO_MODELO:
+            raise OSError("el archivo descargado es demasiado chico")
+        os.replace(parcial, destino)
+    except Exception as error:
+        if os.path.exists(parcial):
+            os.remove(parcial)
+        raise RuntimeError(
+            f"No se pudo descargar el modelo desde {url}\n  {error}\n"
+            "Revisar la conexion a internet y volver a ejecutar."
+        ) from error
+
+
 def cargar_landmarker():
     if not os.path.exists(MODEL_PATH):
-        print("Descargando modelo de pose (solo la primera vez)...")
-        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+        descargar_modelo()
 
     opciones = mp_vision.PoseLandmarkerOptions(
         base_options=mp_python.BaseOptions(model_asset_path=MODEL_PATH),
@@ -325,7 +342,6 @@ class MaquinaRepeticiones:
         if (self.estado, nuevo) == objetivo and ahora - self._ultima > DURACION_MIN_REP:
             self.contador += 1
             self._ultima = ahora
-            print(f"{self.ejercicio['nombre']}: {self.contador}")
 
         self.estado = nuevo
 
@@ -453,7 +469,13 @@ def main():
         print("No se pudo abrir la camara.")
         return
 
-    landmarker = cargar_landmarker()
+    try:
+        landmarker = cargar_landmarker()
+    except RuntimeError as error:
+        print(error)
+        cap.release()
+        return
+
     clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
     suave = Suavizador(FILTRO_CORTE, FILTRO_BETA)
 
@@ -552,7 +574,10 @@ def main():
         if angulo is not None and not menu:
             rango[0] = angulo if rango[0] is None else min(rango[0], angulo)
             rango[1] = angulo if rango[1] is None else max(rango[1], angulo)
+            antes = maquina.contador
             maquina.actualizar(angulo, ahora)
+            if maquina.contador != antes:
+                print(f"{ejercicio['nombre']}: {maquina.contador}")
 
         if angulo is not None and vertice_px is not None:
             x, y = vertice_px

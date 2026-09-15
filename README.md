@@ -95,9 +95,21 @@ la medición no se acepta y aparece un aviso que indica cuál de ellos falla.
 | `docs/DISENO.md` | Funcionamiento interno y fundamentos de las decisiones |
 | `docs/CODIGO.md` | El código explicado línea por línea |
 | `docs/WEB.md` | La versión para navegador y su publicación |
+| `test_contador.py` | Pruebas automatizadas (45 casos) |
+| `tests/casos_compartidos.json` | Casos que Python y JavaScript deben reproducir igual |
 | `web/` | La versión para navegador |
 | `pose_landmarker_full.task` | Modelo de MediaPipe, se descarga automáticamente |
 | `.venv/`, `__pycache__/` | Generados, no se versionan |
+
+## Pruebas
+
+```bash
+.venv\Scripts\python -m unittest -v
+```
+
+Cubren la lógica de medición y conteo: cálculo del ángulo, validación
+geométrica, calibración automática, rechazo de ruido, selección de lado y
+descarga del modelo. No requieren cámara ni dependencias adicionales.
 
 ## Ajustes
 

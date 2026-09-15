@@ -1,0 +1,25 @@
+{
+  "_descripcion": "Casos que las dos implementaciones deben reproducir de forma identica. Los usa test_contador.py en Python y el bloque de comprobacion documentado en docs/WEB.md para JavaScript. Si alguna de las dos deja de coincidir, las implementaciones se separaron.",
+  "_ruido": "Deterministico e identico en ambos lenguajes: x = sin(i * 12.9898) * 43758.5453; ruido = (x - floor(x) - 0.5) * 2",
+  "_senal": "centro + amplitud * cos(2*pi*0.4*(i/30)) + sigma * ruido(i), durante 600 muestras a 30 fps",
+
+  "angulos": [
+    { "nombre": "90 grados en 2D", "puntos": [[0, 0], [0, 1], [1, 1]], "esperado": 90.0 },
+    { "nombre": "180 grados en 2D", "puntos": [[0, 0], [1, 0], [2, 0]], "esperado": 180.0 },
+    { "nombre": "0 grados", "puntos": [[1, 0], [0, 0], [1, 0]], "esperado": 0.0 },
+    { "nombre": "90 grados en 3D", "puntos": [[1, 0, 0], [0, 0, 0], [0, 0, 1]], "esperado": 90.0 },
+    { "nombre": "45 grados", "puntos": [[1, 0], [0, 0], [1, 1]], "esperado": 45.0 }
+  ],
+
+  "conteos": [
+    { "nombre": "curl recorrido completo", "ejercicio": "curl", "centro": 105, "amplitud": 55, "sigma": 3, "esperado": 7 },
+    { "nombre": "sentadilla", "ejercicio": "sentadilla", "centro": 127, "amplitud": 48, "sigma": 3, "esperado": 7 },
+    { "nombre": "press de hombros", "ejercicio": "press", "centro": 125, "amplitud": 45, "sigma": 3, "esperado": 8 },
+    { "nombre": "elevacion lateral", "ejercicio": "elevacion", "centro": 50, "amplitud": 37, "sigma": 3, "esperado": 8 },
+    { "nombre": "curl con ruido fuerte", "ejercicio": "curl", "centro": 105, "amplitud": 55, "sigma": 8, "esperado": 7 },
+    { "nombre": "brazo quieto, ruido bajo", "ejercicio": "curl", "centro": 100, "amplitud": 0, "sigma": 4, "esperado": 0 },
+    { "nombre": "brazo quieto, ruido fuerte", "ejercicio": "curl", "centro": 100, "amplitud": 0, "sigma": 20, "esperado": 0 },
+    { "nombre": "brazo quieto, ruido extremo", "ejercicio": "curl", "centro": 100, "amplitud": 0, "sigma": 30, "esperado": 0 },
+    { "nombre": "recorrido menor al minimo", "ejercicio": "curl", "centro": 105, "amplitud": 20, "sigma": 3, "esperado": 0 }
+  ]
+}
