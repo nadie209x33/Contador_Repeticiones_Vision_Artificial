@@ -304,6 +304,6 @@ export function redactarAviso(vis, ejercicio, angulo, calibrada) {
   if (angulo === null) {
     return "No puedo ubicar " + NOMBRES[ejercicio.puntos[1]] + " con seguridad";
   }
-  if (!calibrada) return "Calibrando: hace una repeticion completa y lenta";
+  if (!calibrada) return "Calibrando: realizar una repetición completa y lenta";
   return null;
 }

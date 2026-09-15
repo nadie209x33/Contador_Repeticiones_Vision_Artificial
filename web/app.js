@@ -84,7 +84,7 @@ function cambiarEjercicio(nueva) {
   longitudes = [];
   lado = null;
   ui.ejercicio.textContent = ejercicio.nombre;
-  ui.vista.textContent = "ponete " + ejercicio.vista;
+  ui.vista.textContent = "ubicarse " + ejercicio.vista;
   dibujarLista();
 }
 

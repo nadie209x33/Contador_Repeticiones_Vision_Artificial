@@ -747,7 +747,7 @@ def dibujar_panel(image, contador, estado, aviso, ejercicio):
     )
 
     texto_legible(image, ejercicio["nombre"], (10, 118), 0.6)     # ejercicio activo
-    texto_legible(image, "ponete " + ejercicio["vista"], (10, 142), 0.5, (120, 220, 255))
+    texto_legible(image, "ubicarse " + ejercicio["vista"], (10, 142), 0.5, (120, 220, 255))
     texto_legible(image, "e = cambiar ejercicio", (10, 166), 0.45, (200, 200, 200), 1)
 
     if aviso:                                # solo cuando hay algo que decir
@@ -841,7 +841,7 @@ def redactar_aviso(vis, ejercicio, angulo, calibrada):
     if angulo is None:                       # el vértice no pasó la validación
         return "No puedo ubicar " + NOMBRES[ejercicio["puntos"][1]] + " con seguridad"
     if not calibrada:                        # mide bien, pero falta el recorrido
-        return "Calibrando: hace una repeticion completa y lenta"
+        return "Calibrando: realizar una repeticion completa y lenta"
     return None                              # todo en orden: sin aviso
 ```
 
