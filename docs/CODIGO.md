@@ -73,8 +73,9 @@ FILTRO_BETA = 10.0             # cuánto se afloja al moverse rápido
 ```
 
 ```python
-RESOLUCION = (1280, 720)       # resolución pedida a la cámara
-VENTANA = "Contador de repeticiones"    # título de la ventana
+TAMANO_MINIMO_MODELO = 1_000_000   # bytes; por debajo, la descarga fallo
+RESOLUCION = (1280, 720)           # resolución pedida a la cámara
+VENTANA = "Contador de repeticiones"   # título de la ventana
 ```
 
 Cabe señalar que aquí **no** figuran los umbrales de ángulo ni la amplitud
@@ -240,10 +241,39 @@ Los dos textos de `MODEL_URL` se pegan solos: en Python, dos cadenas seguidas
 entre paréntesis se concatenan.
 
 ```python
+def descargar_modelo(destino=MODEL_PATH, url=MODEL_URL):
+    parcial = destino + ".parcial"               # nombre temporal
+    print("Descargando modelo de pose (solo la primera vez)...")
+    try:
+        urllib.request.urlretrieve(url, parcial)     # bajar al temporal
+        if os.path.getsize(parcial) < TAMANO_MINIMO_MODELO:
+            raise OSError("el archivo descargado es demasiado chico")
+        os.replace(parcial, destino)             # recién ahora, el nombre real
+    except Exception as error:
+        if os.path.exists(parcial):
+            os.remove(parcial)                   # no dejar restos
+        raise RuntimeError(
+            f"No se pudo descargar el modelo desde {url}\n  {error}\n"
+            "Revisar la conexion a internet y volver a ejecutar."
+        ) from error
+```
+
+La descarga es **atómica**: el archivo viaja con el nombre `.parcial` y solo
+recibe su nombre definitivo si la transferencia termina y supera el tamaño
+mínimo.
+
+Sin esa precaución, una descarga interrumpida deja un archivo truncado. A partir
+de ahí `os.path.exists()` devuelve `True` en cada ejecución, el programa intenta
+cargar un modelo corrupto y falla con un error que no sugiere ni la causa ni la
+solución, que sería borrar el archivo a mano.
+
+`os.replace` reemplaza de forma atómica dentro del mismo sistema de archivos: o
+está el archivo viejo, o está el nuevo, nunca una mezcla.
+
+```python
 def cargar_landmarker():
     if not os.path.exists(MODEL_PATH):           # ¿ya está descargado?
-        print("Descargando modelo de pose (solo la primera vez)...")
-        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)    # bajarlo
+        descargar_modelo()
 
     opciones = mp_vision.PoseLandmarkerOptions(
         base_options=mp_python.BaseOptions(model_asset_path=MODEL_PATH),  # qué archivo usar
@@ -625,10 +655,13 @@ ruido alrededor de un único umbral dispararía varios conteos seguidos.
         if (self.estado, nuevo) == objetivo and ahora - self._ultima > DURACION_MIN_REP:
             self.contador += 1
             self._ultima = ahora
-            print(f"{self.ejercicio['nombre']}: {self.contador}")
 
         self.estado = nuevo                  # el nuevo pasa a ser el actual
 ```
+
+La clase no imprime nada: avisar por consola es tarea de la interfaz, no de la
+lógica. Esa separación es también la que permite probarla sin ensuciar la salida
+de los tests.
 
 Aquí reside lo que permite que un mismo motor sirva para los cuatro ejercicios. Se
 compara **la transición** `(anterior, nuevo)`, y `contar_en` decide cuál cuenta:
@@ -847,7 +880,13 @@ Los `set` son **pedidos**, no órdenes: si la cámara no soporta esa resolución
 entrega la más parecida.
 
 ```python
-    landmarker = cargar_landmarker()              # el detector de pose
+    try:
+        landmarker = cargar_landmarker()          # el detector de pose
+    except RuntimeError as error:                 # sin internet la primera vez
+        print(error)
+        cap.release()                             # soltar la cámara ya abierta
+        return
+
     clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))   # el realce
     suave = Suavizador(FILTRO_CORTE, FILTRO_BETA) # los filtros
 
@@ -1016,7 +1055,10 @@ calcular, o sea si pasó la validación geométrica.
         if angulo is not None and not menu:
             rango[0] = angulo if rango[0] is None else min(rango[0], angulo)
             rango[1] = angulo if rango[1] is None else max(rango[1], angulo)
+            antes = maquina.contador
             maquina.actualizar(angulo, ahora)      # acá se cuenta
+            if maquina.contador != antes:          # hubo repeticion nueva
+                print(f"{ejercicio['nombre']}: {maquina.contador}")
 ```
 
 El `and not menu` es lo que **pausa el conteo mientras el menú está abierto**. La
