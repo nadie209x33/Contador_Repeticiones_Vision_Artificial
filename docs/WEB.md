@@ -117,12 +117,31 @@ producía carteles duplicados.
 La ecualización adaptativa de histograma (CLAHE) no tiene equivalente en el
 navegador. Se la sustituyó por un filtro de canvas
 (`contrast(1.25) brightness(1.08)`), que aplica un ajuste global en lugar de una
-ecualización por zonas, por lo que resulta menos efectivo frente al contraluz.
+ecualización por zonas.
 
-Una implementación equivalente sería posible operando directamente sobre los
-píxeles del canvas, o mediante un shader en WebGL. No se realizó debido a que el
-costo en complejidad es elevado y una iluminación frontal adecuada resuelve el
+Esa diferencia tiene una consecuencia práctica: un ajuste global **puede
+degradar la detección en escenas bien iluminadas**, porque satura las zonas ya
+claras y elimina detalle. Por ese motivo el realce viene desactivado por defecto
+y se expone como una opción en el menú, de modo que pueda evaluarse en cada
+entorno.
+
+Una implementación equivalente a CLAHE sería posible operando directamente sobre
+los píxeles del canvas, o mediante un shader en WebGL. No se realizó debido a que
+el costo en complejidad es elevado y una iluminación frontal adecuada resuelve el
 problema en su origen.
+
+### Ajustes de detección
+
+El menú incluye dos opciones que afectan la calidad de los landmarks:
+
+| Opción | Valor inicial | Efecto |
+|--------|---------------|--------|
+| Modelo | Equilibrado (`full`) | `heavy` ubica las articulaciones con mayor precisión, a costa de fluidez |
+| Realce de contraste | Desactivado | Solo conviene activarlo en condiciones de contraluz |
+
+El cambio de modelo se aplica sin reiniciar la sesión: se construye el detector
+nuevo, se libera el anterior y se reinicia la calibración, ya que los umbrales
+dependen de las mediciones acumuladas.
 
 ---
 
@@ -141,6 +160,11 @@ al igual que en la versión de Python, y se resuelve del mismo modo mediante
 habitualmente opera a 60 Hz mientras la cámara entrega 30 cuadros por segundo.
 Para evitar procesar dos veces la misma imagen, se compara `video.currentTime`
 con el valor anterior y se omite el frame si no ha variado.
+
+**Detención de la cámara.** El botón *Detener cámara* libera las pistas del
+`MediaStream`, cancela el bucle de animación y restablece el estado inicial. Sin
+esa liberación explícita, el indicador de cámara activa del navegador permanece
+encendido aunque la página deje de procesar imágenes.
 
 **Modelo.** Se descarga desde el CDN de Google (9 MB, con CORS habilitado).
 También podría alojarse junto al sitio en Cloudflare, dado que el límite de

@@ -23,13 +23,16 @@ import {
 
 const WASM_BASE =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm";
-const MODELO_URL =
+
+const urlModelo = (variante) =>
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/" +
-  "pose_landmarker_full/float16/latest/pose_landmarker_full.task";
+  `pose_landmarker_${variante}/float16/latest/pose_landmarker_${variante}.task`;
 
 const EJERCICIO_INICIAL = "curl";
 const ESPEJO = true;
-const MEJORAR_CONTRASTE = true;
+
+let modelo = "full";
+let mejorarContraste = false;
 
 const video = document.getElementById("video");
 const lienzo = document.getElementById("lienzo");
@@ -62,6 +65,9 @@ let menuAbierto = false;
 let ultimoTiempoVideo = -1;
 let ultimoMs = -1;
 let t0 = 0;
+let vision = null;
+let stream = null;
+let animacion = null;
 
 function reiniciarMedicion() {
   maquina.reiniciar();
@@ -168,9 +174,7 @@ function procesar(ahora) {
     oculto.height = alto;
   }
 
-  ctxOculto.filter = MEJORAR_CONTRASTE
-    ? "contrast(1.25) brightness(1.08)"
-    : "none";
+  ctxOculto.filter = mejorarContraste ? "contrast(1.25) brightness(1.08)" : "none";
   ctxOculto.drawImage(video, 0, 0, ancho, alto);
 
   ultimoMs = Math.max(Math.round(ahora * 1000), ultimoMs + 1);
@@ -244,11 +248,60 @@ function procesar(ahora) {
 }
 
 function bucle() {
-  if (video.currentTime !== ultimoTiempoVideo) {
+  if (landmarker && video.currentTime !== ultimoTiempoVideo) {
     ultimoTiempoVideo = video.currentTime;
     procesar((performance.now() - t0) / 1000);
   }
-  requestAnimationFrame(bucle);
+  animacion = requestAnimationFrame(bucle);
+}
+
+async function crearLandmarker(variante) {
+  if (!vision) vision = await FilesetResolver.forVisionTasks(WASM_BASE);
+  return PoseLandmarker.createFromOptions(vision, {
+    baseOptions: { modelAssetPath: urlModelo(variante), delegate: "GPU" },
+    runningMode: "VIDEO",
+    numPoses: 1,
+    minPoseDetectionConfidence: 0.6,
+    minPosePresenceConfidence: 0.6,
+    minTrackingConfidence: 0.6,
+  });
+}
+
+async function cambiarModelo(variante) {
+  const anterior = landmarker;
+  landmarker = null;
+  ui.aviso.textContent = "Cargando el modelo " + variante + "...";
+  ui.aviso.hidden = false;
+  try {
+    landmarker = await crearLandmarker(variante);
+    modelo = variante;
+    reiniciarMedicion();
+    if (anterior) anterior.close();
+  } catch (error) {
+    landmarker = anterior;
+    ui.aviso.textContent = "No se pudo cargar el modelo: " + error.message;
+    console.error(error);
+  }
+}
+
+function detener() {
+  if (animacion !== null) cancelAnimationFrame(animacion);
+  animacion = null;
+
+  if (stream) stream.getTracks().forEach((pista) => pista.stop());
+  stream = null;
+  video.srcObject = null;
+
+  ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+  reiniciarMedicion();
+  ultimoTiempoVideo = -1;
+
+  alternarMenu(false);
+  ui.panel.hidden = true;
+  ui.controles.hidden = true;
+  ui.portada.hidden = false;
+  ui.carga.textContent = "";
+  document.getElementById("btn-empezar").disabled = false;
 }
 
 async function empezar() {
@@ -256,19 +309,13 @@ async function empezar() {
   boton.disabled = true;
 
   try {
-    ui.carga.textContent = "Cargando el modelo de pose (unos 9 MB)...";
-    const vision = await FilesetResolver.forVisionTasks(WASM_BASE);
-    landmarker = await PoseLandmarker.createFromOptions(vision, {
-      baseOptions: { modelAssetPath: MODELO_URL, delegate: "GPU" },
-      runningMode: "VIDEO",
-      numPoses: 1,
-      minPoseDetectionConfidence: 0.6,
-      minPosePresenceConfidence: 0.6,
-      minTrackingConfidence: 0.6,
-    });
+    if (!landmarker) {
+      ui.carga.textContent = "Cargando el modelo de pose (unos 9 MB)...";
+      landmarker = await crearLandmarker(modelo);
+    }
 
     ui.carga.textContent = "Pidiendo acceso a la camara...";
-    const stream = await navigator.mediaDevices.getUserMedia({
+    stream = await navigator.mediaDevices.getUserMedia({
       video: {
         width: { ideal: 1280 },
         height: { ideal: 720 },
@@ -301,10 +348,23 @@ document
 document
   .getElementById("btn-reiniciar")
   .addEventListener("click", reiniciarMedicion);
+document.getElementById("btn-detener").addEventListener("click", detener);
+
+const selModelo = document.getElementById("sel-modelo");
+selModelo.value = modelo;
+selModelo.addEventListener("change", (e) => cambiarModelo(e.target.value));
+
+const chkContraste = document.getElementById("chk-contraste");
+chkContraste.checked = mejorarContraste;
+chkContraste.addEventListener("change", (e) => {
+  mejorarContraste = e.target.checked;
+  reiniciarMedicion();
+});
 
 document.addEventListener("keydown", (e) => {
-  if (!landmarker) return;
+  if (!stream) return;
   if (e.key === "e") alternarMenu();
+  if (e.key === "q") detener();
   if (e.key === "r") reiniciarMedicion();
   if (menuAbierto && /^[1-9]$/.test(e.key)) {
     const claves = Object.keys(EJERCICIOS);

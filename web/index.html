@@ -30,6 +30,7 @@
       <div id="controles" hidden>
         <button id="btn-menu" type="button">Ejercicio</button>
         <button id="btn-reiniciar" type="button">Reiniciar</button>
+        <button id="btn-detener" type="button">Detener cámara</button>
       </div>
 
       <div id="portada">
@@ -46,6 +47,26 @@
         <div class="tarjeta">
           <h2>Elegir ejercicio</h2>
           <ul id="lista-ejercicios"></ul>
+
+          <h2>Detección</h2>
+          <label class="ajuste">
+            <span>Modelo</span>
+            <select id="sel-modelo">
+              <option value="lite">Ligero (más rápido)</option>
+              <option value="full" selected>Equilibrado</option>
+              <option value="heavy">Preciso (más lento)</option>
+            </select>
+          </label>
+          <label class="ajuste">
+            <span>Realce de contraste</span>
+            <input id="chk-contraste" type="checkbox" />
+          </label>
+          <p class="nota">
+            El realce ayuda a contraluz, pero con buena iluminación puede
+            empeorar la detección. El modelo preciso ubica mejor las
+            articulaciones a costa de fluidez.
+          </p>
+
           <button id="btn-cerrar" type="button">Cerrar</button>
         </div>
       </div>
